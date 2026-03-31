@@ -25,7 +25,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-full flex-col">
       <header className="px-6 py-4 flex items-center justify-between">
-        <span className="font-semibold tracking-tight">MeetSync</span>
+        <span className="font-semibold tracking-tight">MeetBest</span>
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">{name}</span>
           <form action={signOut}>
