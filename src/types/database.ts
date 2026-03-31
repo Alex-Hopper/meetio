@@ -61,10 +61,26 @@ export type Database = {
           role?: "owner" | "member";
         };
       };
+      group_dates: {
+        Row: {
+          id: string;
+          group_id: string;
+          date: string;
+        };
+        Insert: {
+          id?: string;
+          group_id: string;
+          date: string;
+        };
+        Update: {
+          date?: string;
+        };
+      };
       availability_slots: {
         Row: {
           id: string;
           group_id: string;
+          group_date_id: string;
           user_id: string;
           start_time: string;
           end_time: string;
@@ -72,6 +88,7 @@ export type Database = {
         Insert: {
           id?: string;
           group_id: string;
+          group_date_id: string;
           user_id: string;
           start_time: string;
           end_time: string;
