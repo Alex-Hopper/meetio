@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createDailyRoom } from "@/lib/daily";
+import {
+  createDailyRoom,
+  getDailyUsageMinutes,
+  DAILY_PARTICIPANT_MINUTES_LIMIT,
+} from "@/lib/daily";
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -49,6 +53,17 @@ export async function POST(req: NextRequest) {
 
   if (!membership) {
     return NextResponse.json({ error: "Not a group member" }, { status: 403 });
+  }
+
+  // Check participant-minutes usage before creating a new room
+  const usageMinutes = await getDailyUsageMinutes();
+  if (usageMinutes >= DAILY_PARTICIPANT_MINUTES_LIMIT) {
+    return NextResponse.json(
+      {
+        error: `Monthly participant-minutes limit reached (${usageMinutes}/${DAILY_PARTICIPANT_MINUTES_LIMIT}). New meetings are disabled to stay within the free tier.`,
+      },
+      { status: 403 }
+    );
   }
 
   // Create room with Daily.co
