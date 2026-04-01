@@ -66,6 +66,7 @@ export default async function MeetingPage({
       groupId={groupId}
       groupName={group?.name ?? "Group"}
       userName={userName}
+      currentUserId={user.id}
     />
   );
 }

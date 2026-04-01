@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { ArrowLeft, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VideoCall } from "@/components/video-call";
+import { ChatPanel } from "@/components/chat-panel";
 
 interface Meeting {
   id: string;
@@ -23,6 +24,7 @@ interface MeetingRoomProps {
   groupId: string;
   groupName: string;
   userName: string;
+  currentUserId: string;
 }
 
 export function MeetingRoom({
@@ -30,6 +32,7 @@ export function MeetingRoom({
   groupId,
   groupName,
   userName,
+  currentUserId,
 }: MeetingRoomProps) {
   const [roomUrl, setRoomUrl] = useState<string | null>(
     meeting.daily_room_url
@@ -96,33 +99,45 @@ export function MeetingRoom({
         </div>
       </div>
 
-      {/* Video area */}
-      {inCall && roomUrl ? (
-        <VideoCall
-          roomUrl={roomUrl}
-          userName={userName}
-          onLeave={() => setInCall(false)}
-        />
-      ) : (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-20 space-y-4">
-          <div className="size-12 rounded-full bg-muted flex items-center justify-center">
-            <Video className="size-5 text-muted-foreground" />
-          </div>
-          <div className="text-center space-y-1">
-            <p className="text-sm font-medium">Ready to join?</p>
-            <p className="text-xs text-muted-foreground">
-              {roomUrl
-                ? "A room is active. Click to join the call."
-                : "You'll be the first to join. A room will be created for you."}
-            </p>
-          </div>
-          <Button onClick={handleJoin} disabled={isJoining}>
-            <Video className="size-3.5" />
-            {isJoining ? "Setting up…" : "Join now"}
-          </Button>
-          {error && <p className="text-sm text-destructive">{error}</p>}
+      {/* Video + Chat */}
+      <div className="flex gap-4" style={{ height: "calc(100vh - 200px)" }}>
+        <div className="flex-1 min-w-0">
+          {inCall && roomUrl ? (
+            <VideoCall
+              roomUrl={roomUrl}
+              userName={userName}
+              onLeave={() => setInCall(false)}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-20 space-y-4">
+              <div className="size-12 rounded-full bg-muted flex items-center justify-center">
+                <Video className="size-5 text-muted-foreground" />
+              </div>
+              <div className="text-center space-y-1">
+                <p className="text-sm font-medium">Ready to join?</p>
+                <p className="text-xs text-muted-foreground">
+                  {roomUrl
+                    ? "A room is active. Click to join the call."
+                    : "You'll be the first to join. A room will be created for you."}
+                </p>
+              </div>
+              <Button onClick={handleJoin} disabled={isJoining}>
+                <Video className="size-3.5" />
+                {isJoining ? "Setting up…" : "Join now"}
+              </Button>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="w-80 shrink-0">
+          <ChatPanel
+            meetingId={meeting.id}
+            currentUserId={currentUserId}
+            userName={userName}
+          />
+        </div>
+      </div>
     </div>
   );
 }
