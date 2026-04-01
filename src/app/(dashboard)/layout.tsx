@@ -25,8 +25,8 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-full flex-col">
-      <header className="px-6 py-4 flex items-center justify-between">
-        <Link href={"/dashboard"} className="font-semibold tracking-tight">MeetBest</Link>
+      <header className="max-w-5xl w-full mx-auto px-6 py-4 flex items-center justify-between">
+        <Link href={"/dashboard"} className="text-l font-semibold tracking-tight">Meetio</Link>
         <div className="flex items-center gap-4">
           <Link href={"/dashboard"} className="text-sm text-muted-foreground">{name}</Link>
           <form action={signOut}>

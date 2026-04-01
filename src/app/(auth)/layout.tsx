@@ -13,7 +13,7 @@ export default function AuthLayout({
           <div className="size-7 rounded-full bg-white/20 flex items-center justify-center">
             <div className="size-3 rounded-full bg-white" />
           </div>
-          MeetBest
+          Meetio
         </div>
 
         <div className="space-y-4 mt-2">
