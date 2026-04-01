@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { signOut } from "./actions";
+import Link from "next/link";
 
 export default async function DashboardLayout({
   children,
@@ -25,9 +26,9 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-full flex-col">
       <header className="px-6 py-4 flex items-center justify-between">
-        <span className="font-semibold tracking-tight">MeetBest</span>
+        <Link href={"/dashboard"} className="font-semibold tracking-tight">MeetBest</Link>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground">{name}</span>
+          <Link href={"/dashboard"} className="text-sm text-muted-foreground">{name}</Link>
           <form action={signOut}>
             <Button variant="ghost" size="sm" type="submit">
               Sign out

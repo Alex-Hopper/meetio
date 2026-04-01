@@ -48,21 +48,35 @@ export default async function GroupPage({
   // Verify current user is a member
   if (!members.some((m) => m.user_id === user.id)) notFound();
 
-  // Fetch dates and availability in parallel
-  const [{ data: datesData }, { data: slotsData }] = await Promise.all([
-    supabase
-      .from("group_dates")
-      .select("id, date")
-      .eq("group_id", groupId)
-      .order("date"),
-    supabase
-      .from("availability_slots")
-      .select("user_id, group_date_id, start_time, end_time")
-      .eq("group_id", groupId),
-  ]);
+  // Fetch dates, availability, and meetings in parallel
+  const [{ data: datesData }, { data: slotsData }, { data: meetingsData }] =
+    await Promise.all([
+      supabase
+        .from("group_dates")
+        .select("id, date")
+        .eq("group_id", groupId)
+        .order("date"),
+      supabase
+        .from("availability_slots")
+        .select("user_id, group_date_id, start_time, end_time")
+        .eq("group_id", groupId),
+      supabase
+        .from("meetings")
+        .select("id, title, scheduled_start, scheduled_end, daily_room_url, status")
+        .eq("group_id", groupId)
+        .order("scheduled_start"),
+    ]);
 
   const dates = (datesData ?? []) as { id: string; date: string }[];
   const slots = (slotsData ?? []) as SlotRow[];
+  const meetings = (meetingsData ?? []) as {
+    id: string;
+    title: string | null;
+    scheduled_start: string;
+    scheduled_end: string;
+    daily_room_url: string | null;
+    status: "scheduled" | "active" | "ended";
+  }[];
 
   return (
     <GroupDetail
@@ -70,6 +84,7 @@ export default async function GroupPage({
       members={members}
       dates={dates}
       slots={slots}
+      meetings={meetings}
       currentUserId={user.id}
     />
   );
