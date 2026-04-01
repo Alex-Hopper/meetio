@@ -137,3 +137,48 @@ export async function saveAvailability(
   revalidatePath(`/groups/${groupId}`);
   return { success: true };
 }
+
+export async function createMeeting(
+  groupId: string,
+  title: string,
+  scheduledStart: string,
+  scheduledEnd: string
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  // Verify membership
+  const { data: membership } = await supabase
+    .from("group_members")
+    .select("role")
+    .eq("group_id", groupId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!membership) {
+    return { error: "You are not a member of this group" };
+  }
+
+  const { data: meeting, error } = await supabase
+    .from("meetings")
+    .insert({
+      group_id: groupId,
+      title,
+      scheduled_start: scheduledStart,
+      scheduled_end: scheduledEnd,
+      created_by: user.id,
+    })
+    .select("id")
+    .single();
+
+  if (error || !meeting) {
+    return { error: error?.message ?? "Failed to create meeting" };
+  }
+
+  revalidatePath(`/groups/${groupId}`);
+  return { success: true, meetingId: meeting.id };
+}

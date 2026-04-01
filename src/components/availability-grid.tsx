@@ -361,10 +361,9 @@ export function AvailabilityGrid({
 
       {/* Save / status */}
       {viewMode === "self" && (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-end gap-3">
           <Button onClick={handleSave} disabled={!isDirty || isSaving} size="sm">
-            <Save className="size-3.5" />
-            {isSaving ? "Saving…" : isDirty ? "Save availability" : "Saved"}
+            {isSaving ? "Saving…" : isDirty ? "Save your availability" : "Saved"}
           </Button>
           {saveError && (
             <p className="text-sm text-destructive">{saveError}</p>
