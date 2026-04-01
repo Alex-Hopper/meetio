@@ -123,7 +123,12 @@ export function GroupDetail({
     }
   }
 
-  const activeMeetings = meetings.filter((m) => m.status !== "ended");
+  const MEETING_VISIBLE_AFTER_END_MS = 60 * 60 * 1000; // 60 minutes
+  const activeMeetings = meetings.filter((m) => {
+    if (m.status === "ended") return false;
+    const endTime = new Date(m.scheduled_end).getTime();
+    return Date.now() - endTime <= MEETING_VISIBLE_AFTER_END_MS;
+  });
 
   return (
     <div className="flex gap-8">
