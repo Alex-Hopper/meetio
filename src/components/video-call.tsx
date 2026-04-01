@@ -159,8 +159,11 @@ function ParticipantTile({
   isLocal: boolean;
 }) {
   const videoState = useParticipantProperty(sessionId, "tracks.video.state");
+  const audioState = useParticipantProperty(sessionId, "tracks.audio.state");
   const userName = useParticipantProperty(sessionId, "user_name");
   const cameraIsOff = videoState === "off" || videoState === "blocked";
+  const isMuted = audioState === "off" || audioState === "blocked";
+  const displayName = isLocal ? "You" : userName || "Guest";
 
   return (
     <div className="relative aspect-video w-full max-h-full rounded-lg overflow-hidden bg-muted">
@@ -170,7 +173,7 @@ function ParticipantTile({
             <User className="size-6 text-muted-foreground" />
           </div>
           <span className="text-xs text-muted-foreground">
-            {isLocal ? "Camera off" : userName || "Camera off"}
+            {displayName}
           </span>
         </div>
       ) : (
@@ -182,11 +185,21 @@ function ParticipantTile({
           style={isLocal ? { transform: "scaleX(-1)" } : undefined}
         />
       )}
-      {isLocal && (
-        <span className="absolute bottom-2 left-2 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
-          You
+      <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+        <span className="rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
+          {displayName}
         </span>
-      )}
+        {isMuted && (
+          <span className="flex items-center rounded bg-black/60 p-1">
+            <MicOff className="size-2.5 text-red-400" />
+          </span>
+        )}
+        {cameraIsOff && (
+          <span className="flex items-center rounded bg-black/60 p-1">
+            <CameraOff className="size-2.5 text-red-400" />
+          </span>
+        )}
+      </div>
     </div>
   );
 }
