@@ -21,6 +21,7 @@ export type Database = {
           display_name?: string | null;
           avatar_url?: string | null;
         };
+        Relationships: [];
       };
       groups: {
         Row: {
@@ -41,6 +42,15 @@ export type Database = {
           name?: string;
           description?: string | null;
         };
+        Relationships: [
+          {
+            foreignKeyName: "groups_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       group_members: {
         Row: {
@@ -60,6 +70,22 @@ export type Database = {
         Update: {
           role?: "owner" | "member";
         };
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "group_members_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       group_dates: {
         Row: {
@@ -75,6 +101,15 @@ export type Database = {
         Update: {
           date?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "group_dates_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       availability_slots: {
         Row: {
@@ -97,6 +132,29 @@ export type Database = {
           start_time?: string;
           end_time?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "availability_slots_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "availability_slots_group_date_id_fkey";
+            columns: ["group_date_id"];
+            isOneToOne: false;
+            referencedRelation: "group_dates";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "availability_slots_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       meetings: {
         Row: {
@@ -131,6 +189,22 @@ export type Database = {
           daily_room_name?: string | null;
           status?: "scheduled" | "active" | "ended";
         };
+        Relationships: [
+          {
+            foreignKeyName: "meetings_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "meetings_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       chat_messages: {
         Row: {
@@ -152,6 +226,22 @@ export type Database = {
         Update: {
           content?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_meeting_id_fkey";
+            columns: ["meeting_id"];
+            isOneToOne: false;
+            referencedRelation: "meetings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_messages_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       transcript_fragments: {
         Row: {
@@ -171,7 +261,27 @@ export type Database = {
         Update: {
           content?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "transcript_fragments_meeting_id_fkey";
+            columns: ["meeting_id"];
+            isOneToOne: false;
+            referencedRelation: "meetings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "transcript_fragments_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 };
