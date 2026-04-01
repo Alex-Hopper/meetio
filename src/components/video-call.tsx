@@ -8,11 +8,12 @@ import {
   DailyAudio,
   useParticipantIds,
   useLocalSessionId,
+  useParticipantProperty,
   useMeetingState,
   useDaily,
 } from "@daily-co/daily-react";
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff, PhoneOff } from "lucide-react";
+import { Camera, CameraOff, Mic, MicOff, PhoneOff, User } from "lucide-react";
 
 interface VideoCallProps {
   roomUrl: string;
@@ -51,12 +52,20 @@ function CallUI({ onLeave }: { onLeave?: () => void }) {
   const localSessionId = useLocalSessionId();
   const participantIds = useParticipantIds();
   const [muted, setMuted] = useState(false);
+  const [cameraOff, setCameraOff] = useState(false);
 
   function handleToggleMute() {
     if (!daily) return;
     const newMuted = !muted;
     daily.setLocalAudio(!newMuted);
     setMuted(newMuted);
+  }
+
+  function handleToggleCamera() {
+    if (!daily) return;
+    const newOff = !cameraOff;
+    daily.setLocalVideo(!newOff);
+    setCameraOff(newOff);
   }
 
   function handleLeave() {
@@ -99,28 +108,13 @@ function CallUI({ onLeave }: { onLeave?: () => void }) {
       <div
         className={`grid gap-2 mx-auto flex-1 min-h-0 w-full place-items-center ${gridClasses}`}
       >
-        {participantIds.map((id) => {
-          const isLocal = id === localSessionId;
-          return (
-            <div
-              key={id}
-              className="relative aspect-video w-full max-h-full rounded-lg overflow-hidden bg-muted"
-            >
-              <DailyVideo
-                sessionId={id}
-                type="video"
-                fit="cover"
-                className="h-full w-full object-cover"
-                style={isLocal ? { transform: "scaleX(-1)" } : undefined}
-              />
-              {isLocal && (
-                <span className="absolute bottom-2 left-2 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
-                  You
-                </span>
-              )}
-            </div>
-          );
-        })}
+        {participantIds.map((id) => (
+          <ParticipantTile
+            key={id}
+            sessionId={id}
+            isLocal={id === localSessionId}
+          />
+        ))}
       </div>
 
       <div className="flex justify-center gap-2 pt-3 shrink-0">
@@ -136,11 +130,63 @@ function CallUI({ onLeave }: { onLeave?: () => void }) {
           )}
           {muted ? "Unmute" : "Mute"}
         </Button>
+        <Button
+          variant={cameraOff ? "secondary" : "outline"}
+          size="sm"
+          onClick={handleToggleCamera}
+        >
+          {cameraOff ? (
+            <CameraOff className="size-3.5 text-destructive" />
+          ) : (
+            <Camera className="size-3.5" />
+          )}
+          {cameraOff ? "Turn on" : "Turn off"}
+        </Button>
         <Button variant="destructive" size="sm" onClick={handleLeave}>
           <PhoneOff className="size-3.5" />
           Leave call
         </Button>
       </div>
+    </div>
+  );
+}
+
+function ParticipantTile({
+  sessionId,
+  isLocal,
+}: {
+  sessionId: string;
+  isLocal: boolean;
+}) {
+  const videoState = useParticipantProperty(sessionId, "tracks.video.state");
+  const userName = useParticipantProperty(sessionId, "user_name");
+  const cameraIsOff = videoState === "off" || videoState === "blocked";
+
+  return (
+    <div className="relative aspect-video w-full max-h-full rounded-lg overflow-hidden bg-muted">
+      {cameraIsOff ? (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-muted">
+          <div className="flex size-12 items-center justify-center rounded-full bg-muted-foreground/10">
+            <User className="size-6 text-muted-foreground" />
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {isLocal ? "Camera off" : userName || "Camera off"}
+          </span>
+        </div>
+      ) : (
+        <DailyVideo
+          sessionId={sessionId}
+          type="video"
+          fit="cover"
+          className="h-full w-full object-cover"
+          style={isLocal ? { transform: "scaleX(-1)" } : undefined}
+        />
+      )}
+      {isLocal && (
+        <span className="absolute bottom-2 left-2 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
+          You
+        </span>
+      )}
     </div>
   );
 }
